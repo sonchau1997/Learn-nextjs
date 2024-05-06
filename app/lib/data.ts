@@ -34,12 +34,18 @@ export async function fetchRevenue() {
 
 export async function fetchLatestInvoices() {
   try {
+    // const data = await sql<LatestInvoiceRaw>`
+    //   SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
+    //   FROM invoices
+    //   JOIN customers ON invoices.customer_id = customers.id
+    //   ORDER BY invoices.date DESC
+    //   LIMIT 5`;
     const data = await sql<LatestInvoiceRaw>`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      ORDER BY invoices.date DESC
-      LIMIT 5`;
+  SELECT invoices.amount, customers.name, customers.image_url, customers.email
+  FROM invoices
+  JOIN customers ON invoices.customer_id = customers.id
+  ORDER BY invoices.date DESC
+  LIMIT 5`;
 
     const latestInvoices = data.rows.map((invoice) => ({
       ...invoice,
@@ -63,7 +69,6 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
-
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,
